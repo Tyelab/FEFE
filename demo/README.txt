@@ -28,3 +28,7 @@ We created a mouse face skeleton structured for 23 points as follows:
 As you can see, in our initial SLEAP model, we ambitiously tried to track the whisker movement before realizing that the camera frame rate was too slow to effectively capture whiskers.
 FEFE is designed to operate from a sleap skeleton using the node-names field.  That means that facial features can be extracted, even if your model uses a different number of keypoints or has different names associated with them.
 
+To run the demo, open MATLAB and run load_sleap_video_events.m in the terminal.
+This loads the h5 file, the events file, and the spout file into a matlab structure (mouseData) and then calls the second function "compute_select_features_v02.m"
+
+The file compute_selecte_features_v02.m will use specific keypoints from our skeleton to compute each feature.

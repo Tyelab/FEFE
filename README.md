@@ -5,3 +5,6 @@ This toolbox extracts various features from facial tracked sleap videos using Ma
 
 The /demo/ folder contains example data from a head-fixed mouse including: pose estimates from SLEAP, an events file detailing reward and adversive stimuli, and a spout file.  The spout file is a matlab file that imports the length of the spout in the facial video and uses it to convert distances from pixels to cm.
 The file load_sleap_events_video.m shows how to load and extract the features.
+
+## System requirements
+To run this code, you must have MATLAB installed. This code was tested using MATLAB version 9.14.0.2286388 (R2023a) Update 3.

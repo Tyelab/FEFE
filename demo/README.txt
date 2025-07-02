@@ -1,3 +1,9 @@
+# To run the demo
+1. Clone this repository `git clone git@github.com:Tyelab/FEFE.git`
+2. Open matlab and navigate to the Git directory, then cd to the demo directory `cd demo`.
+3. Run the script called `load_sleap_video_events`.
+
+# Info about demo data
 This demo folder shows how you can extract particular facial features using a SLEAP pose estimation file.  
 In this example, we are working on video data collected from a headfixed mouse. The video is a close up of the mouse's face.
 We created a mouse face skeleton structured for 23 points as follows:

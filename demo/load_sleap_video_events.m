@@ -3,12 +3,15 @@ function mouseData = load_sleap_video_events(vidpath_in, eventFile_in, h5file_in
 %
 % Load the sleap predictions and the associated events file
 %
-% In detail this script first extracts the FE features
-% 1. loads data from SpecialK project, chronic stress or learned
-% helplessness paragigm and creates the structure mouseData 
+% This script creates the structure mouseData, which includes
 %    
-% 2. extracts the sleap track data from tracked mouse faces, using a
-%    pre-defined SLEAP model (i.e., this is not run in this script)
+% 1. the sleap track data from tracked mouse faces, using a pre-defined
+%    SLEAP model (i.e., this is not run in this script) 
+% 2. an events file showing the trial structure of stimuli presentation
+% 3. (optional) a spout file, that contains the conversion of pixels to cm
+% 4. (optional) a video file of the mouse
+% 
+% The script then creates a features table using the sleap tracked data.
 %
 % INPUTS
 %  vidpath_in   - full path to raw video file (mp4)
@@ -30,11 +33,24 @@ function mouseData = load_sleap_video_events(vidpath_in, eventFile_in, h5file_in
 %
 % Written by Laurel Keyes on 9/11/2023, updated on 1/11/2024
 
+% addpath to source codes
+gitdir = pwd; tmp = split(gitdir,'demo'); 
+maindir = tmp{1};
+addpath(genpath(fullfile(maindir,'src')));
+
 if nargin<4
     vidpath_in   = 'data\20230225_CSE022_plane1_-367.5.mp4';
     eventFile_in = 'data\CSE022_20230225_corrected.csv';
     h5file_in    = 'data\20230225_CSE022_plane1_-367.5.predictions.analysis.h5';
     spoutfile_in = 'data\20230225_CSE022_plane1_-367.5_SL_spout.mat';
+end
+
+% check that file has been downloaded and placed in data folder
+if exist("vidpath_in",'file')==2
+    LOAD_VIDEO = 1;
+else
+    warning(sprintf(' !!! Video file not Found !!! \nYou must download the video file and move to data directory. \nThis code will continue without the video being loaded.'))
+    LOAD_VIDEO = 0;
 end
 
 if exist("spoutfile_in","var")   
@@ -46,52 +62,61 @@ else
     error('could not find spoutfile')
 end
 
-gitdir = pwd; tmp = split(gitdir,'demo'); 
-maindir = tmp{1};
-addpath(genpath(fullfile(maindir,'src')));
 
-% error checks
-% 1) make sure data and subject id match across files
-[mp4path,mp4file,~] = fileparts(vidpath_in);
-[~, eventfile,~] = fileparts(eventFile_in);
+% get the name tag to use from file name
+% [~, eventfile,~] = fileparts(eventFile_in);
 [~,h5file,~] = fileparts(h5file_in);
-tmp1 = split( eventfile,'_raw');
+tmp1 = split( h5file,'.predictions');
 nametag = tmp1{1};
-ZSCORE_FLAG = 0; % do not normalize to baseline
 
+% set FLAGS
+ZSCORE_FLAG = 0; % when 0, do NOT normalize to baseline; when 1 normalize
 VERBOSE = 1; % print comments to screen
 
 %% create mouseData structure with basic info about session
-tmp = split( nametag,'_');
+% tmp = split( nametag,'_');
 
-mouseData.folder = mp4path;
-mouseData.id = tmp{2};
-mouseData.session = tmp{1};
+%mouseData.folder = mp4path;
+% mouseData.id = tmp{2};
+% mouseData.session = tmp{1};
 mouseData.Spout= Spout;
-if VERBOSE, fprintf("\nCreating %s_%s\n", mouseData.id ,  mouseData.session);end
+if VERBOSE, fprintf("\nCreating %s\n", nametag);end
 
 
 %% load video info
-% get video frame rate information
-if VERBOSE, fprintf('\tAdding video details\n');end
+if LOAD_VIDEO
+    % get video frame rate information
+    if VERBOSE, fprintf('\tAdding video details\n');end
 
-if exist(vidpath_in,'file')
-    v = VideoReader(vidpath_in);
-    c.facialVid_fps = v.FrameRate; % this is the frame rate of the facial video, however here we want to use the bruker frame rate, which is ~29.87
-    % c.Bruker_fps = 29.87; % this is the frame rate of the Bruker 2p microscope
-    % c.note = 'frame rate of the facial video differs from Bruker frame rate, which is ~29.87; FaceVidEvents_msec = BrukerEvents_msec*Bruker_fps/FaceVid_fps';
-    c.NumFrames = round(v.Duration*v.FrameRate);
-    if VERBOSE, fprintf('\tvideo=%s \n',vidpath_in);end
-    if VERBOSE, fprintf('\tThis video frame rate is %3.5f\n',c.facialVid_fps);end
+    if exist(vidpath_in,'file')
+        v = VideoReader(vidpath_in);
+        c.facialVid_fps = v.FrameRate; % this is the frame rate of the facial video, however here we want to use the bruker frame rate, which is ~29.87
+        % c.Bruker_fps = 29.87; % this is the frame rate of the Bruker 2p microscope
+        % c.note = 'frame rate of the facial video differs from Bruker frame rate, which is ~29.87; FaceVidEvents_msec = BrukerEvents_msec*Bruker_fps/FaceVid_fps';
+        c.NumFrames = round(v.Duration*v.FrameRate);
+        if VERBOSE, fprintf('\tvideo=%s \n',vidpath_in);end
+        if VERBOSE, fprintf('\tThis video frame rate is %3.5f\n',c.facialVid_fps);end
 
+    else
+        error('Video not found! (%s)',vidpath_in)
+    end
+    mouseData.vidpath = vidpath_in;
+    % mouseData.Bruker_fps = c.Bruker_fps;
+    mouseData.fps = c.facialVid_fps;  % all videos in this cohort used 30 fps
+    % mouseData.fps_note = c.note;
+    mouseData.numFrames = c.NumFrames;  % all videos in this cohort used 30 fps
 else
-    error('Video not found! (%s)',vidpath_in)
+    % manually enter the frame rate of the video
+    x = input('Enter the frame rate of the video used in H5 predictions file:  ');    
+    if ~isnumeric(x)
+        error('error! enter the frame rate as numbers only.  For example if the frame rate is 30 fps, enter 30')
+    else
+        c.facialVid_fps = x;
+    end      
 end
-mouseData.vidpath = vidpath_in;
-% mouseData.Bruker_fps = c.Bruker_fps;
-mouseData.fps = c.facialVid_fps;  % all videos in this cohort used 30 fps
-% mouseData.fps_note = c.note;
-mouseData.numFrames = c.NumFrames;  % all videos in this cohort used 30 fps
+
+
+%% 
 mouseData.event_file_in = eventFile_in;
 mouseData.sleap_h5_file_in = h5file_in;
 mouseData.spout_file_in = spoutfile_in;
@@ -167,23 +192,26 @@ mouseData.node_names = mouseData.node_names(~iLeftNostril);
 mouseData.point_scores = mouseData.point_scores(:,~iLeftNostril);
 mouseData.tracks    = mouseData.tracks(:,~iLeftNostril,:);
 
-% SMOOTH the track points using savitzky-golay filter, 2 points before,
+%% SMOOTH the track points using savitzky-golay filter, 2 points before,
 % 2 points after current point; by default this ignores nan entries
 mouseData.tracks = smoothdata(mouseData.tracks, 1, 'sgolay', 5); % mouseData now contains smoothed track data
 
-% Replace individual missing sleap track points with k-nearest neighbor
+%% Replace individual missing sleap track points with k-nearest neighbor
 % entry for ear (keypoints = 6:11)
 % md_tracks_fix = fill_nan_sleap_track(mouseData.tracks,6:11, mouseData.vidpath,0);
 % mouseData.tracks = md_tracks_fix;
 
-% fill in nan entries in tracks when fewer than 15 consecutive entries,
+%% fill in nan entries in tracks when fewer than 15 consecutive entries,
 % e.g. 1/2 second
+% below we set the maximum number of frames that are allowed to be NAN
+% in our 30 fps paradigm, 15 frames is about 1/2 second
 max_consecutive_nan_thresh = 15;
 tmp = interpolate_nan_entries_in_sleap_tracks(mouseData,max_consecutive_nan_thresh);
 mouseData = tmp; clear tmp
 
 
 if VERBOSE, fprintf('\tDone adding tracks\n');end
+
 
 %% Extract featurenames
 keypts = mouseData.node_names; % get the node names from sleap
@@ -193,6 +221,7 @@ keypts = clean_up_node_names(keypts); % clean up so well formatted
 %% extract the features for all frames in this session
 tempTrack =  compute_select_features_v02(mouseData, 1:size(mouseData.tracks,1), keypts,ZSCORE_FLAG);
 mouseData.features = tempTrack;
+
 end
 
 

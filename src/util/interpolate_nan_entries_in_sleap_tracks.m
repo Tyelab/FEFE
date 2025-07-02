@@ -72,7 +72,9 @@ nodes_to_be_interpolated = find(max_successive_nan_count>0 & max_successive_nan_
 %% for every node with nan entries, where the max consecutive is below threshold, interpolate nan entries
 interpolated_md = md;    
 if ~isempty(nodes_to_be_interpolated)
-    vid = VideoReader(md.vidpath)   ; % used in debug mode to plot interpolated points
+    if DBG
+        vid = VideoReader(md.vidpath)   ; % used in debug mode to plot interpolated points
+    end
 
     for nn = 1:numel(nodes_to_be_interpolated)
         node = nodes_to_be_interpolated(nn);

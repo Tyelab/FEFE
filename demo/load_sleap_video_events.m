@@ -56,6 +56,7 @@ else
     fileID = '1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM';
     url = sprintf('https://drive.google.com/uc?export=download&id=%s', fileID);
     outFile = 'data\20230225_CSE022_plane1_-367.5.mp4';  
+    drive_msg = sprintf('\nYou must download the video file and move to data directory.\n Use this google drive link: \n\thttps://drive.google.com/file/d/%s/view?usp=drive_link\n',fileID);
 
     fprintf('... file not found! \nAttempting to download from Tyelab google drive... \n\n')
     try
@@ -67,7 +68,7 @@ else
         LOAD_VIDEO = 1;
     catch ME
         fprintf(2, 'Error downloading file: %s\n', ME.message);
-        fprintf('\nYou must download the video file and move to data directory.\n Use this google drive link: \n\thttps://drive.google.com/file/d/1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM/view?usp=drive_link\n ')
+        fprintf(drive_msg)
         % Optionally rethrow or handle specific cases
         % rethrow(ME);
         LOAD_VIDEO = 0;
@@ -80,8 +81,7 @@ else
         v = VideoReader(vidpath_in);
     catch ME
         fprintf(2, 'Video file appears to be corrupted!\n %s\n', ME.message);        
-        fprintf('\nYou must download the video file and move to data directory.\n ')
-        fprintf('Use this google drive link: \n\thttps://drive.google.com/file/d/1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM/view?usp=drive_link\n ')
+        fprintf(drive_msg)
         fprintf('Program will remove corrupted file and continue without video.\n\n')
         delete(vidpath_in)
         LOAD_VIDEO = 0;

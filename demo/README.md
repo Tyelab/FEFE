@@ -26,7 +26,7 @@ We created a mouse face skeleton structured for 23 points as follows:
 - 16 - `mouth_upper`
 - 17 - `mouth_lower`
 - 18 - `chin`
-- 19 - `headplate`
+- 19 - `headplate`  *(not used for features, only for SLEAP tracking)
 - 20 - `top_whisker_stem`
 - 21 - `top_whisker_end` *(not used, too unreliable!)*
 - 22 - `bottom_whisker_stem`

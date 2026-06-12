@@ -53,7 +53,8 @@ if exist(vidpath_in,'file')==2
 else
     
     %google_link = 'https://drive.google.com/file/d/1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM/view?usp=drive_link';
-    fileID = '1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM';
+    %fileID = '1OVx5j9EGm0spBwF-NX4SjhbkNVs_JWUM'; % orignal link was removed at some point
+    fileID = '1SiN0bO6Hdc6yO8zOvPur5MjtRuywl2q5'; % correct link as of 06/12/2026
     url = sprintf('https://drive.google.com/uc?export=download&id=%s', fileID);
     outFile = 'data\20230225_CSE022_plane1_-367.5.mp4';  
     drive_msg = sprintf('\nYou must download the video file and move to data directory.\n Use this google drive link: \n\thttps://drive.google.com/file/d/%s/view?usp=drive_link\n',fileID);
@@ -62,9 +63,9 @@ else
     try
         fprintf('Starting video download...\n');
         websave(outFile, url);
-        fprintf('Download completed successfully. Saved as %s\n', outFile);
+        fprintf('Inital download completed. Saved as %s\n', outFile);
 
-        vidpath_in = fullfile(maindir,'demo', outFile)
+        vidpath_in = fullfile(maindir,'demo', outFile);
         LOAD_VIDEO = 1;
     catch ME
         fprintf(2, 'Error downloading file: %s\n', ME.message);
@@ -76,9 +77,9 @@ else
 
 
     % test that file downloaded correctly
-    fprintf('Verifying video download...')
+    fprintf('Verifying video downloaded correctly...')
     try
-        v = VideoReader(vidpath_in);
+        v = VideoReader(vidpath_in); %#ok<NASGU>
     catch ME
         fprintf(2, 'Video file appears to be corrupted!\n %s\n', ME.message);        
         fprintf(drive_msg)
@@ -95,7 +96,7 @@ if exist("spoutfile_in","var")
     fprintf('done.\n')
 else
      % no spout file is provided
-    Spout = [];
+    Spout = []; %#ok<NASGU>
     error('could not find spoutfile')
 end
 

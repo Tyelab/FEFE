@@ -1,0 +1,9 @@
+# Video files
+*.mp4
+
+# MATLAB backup files
+*.asv       # Windows
+*.m~        # Linux
+
+# MATLAB data files
+*.mat       

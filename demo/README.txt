@@ -38,3 +38,19 @@ To run the demo, open MATLAB and run load_sleap_video_events.m in the terminal.
 This loads the h5 file, the events file, and the spout file into a matlab structure (mouseData) and then calls the second function "compute_select_features_v02.m"
 
 The file compute_selecte_features_v02.m will use specific keypoints from our skeleton to compute each feature.
+
+# Troubleshooting
+If you have difficulty getting the data video to download through the matlab call to google, you can manually download and move to the demo/data directory
+1. Follow the link `https://drive.google.com/drive/u/1/folders/13Zfh9mzPmIAXEF93r-qh0HPxJnf4lwo9` and download video.
+2. Copy video to ~/FEFE/demo/data
+Try running the matlab script again.
+
+
+
+
+
+
+
+
+
+

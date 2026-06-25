@@ -1,4 +1,4 @@
-function tempTrack = compute_centroid_features(mouseData, shockFrames, keypts, keypts_index, feature_name, tempTrack,PRESERVE_NAN)
+function tempTrack = compute_centroid_features(mouseData, shockFrames, keypts, keypts_index_in, feature_name, tempTrack,PRESERVE_NAN)
 % tempTrack = compute_centroid_features(mouseData, shockFrames, keypts)
 %
 % This function will compute the distance between unique pairs of keypts
@@ -49,7 +49,6 @@ elseif iscell(mouseData) && size(mouseData,2)>1
     error('input mouseData should be a structure, NOT a cell array')
 end
 
-
 % error check: make sure mouseData has tracks in the structure
 if ~isfield(mouseData,'tracks')
     error('%s:Input structure "mouseData" does not contain the expected field "tracks"',mfilename);
@@ -58,6 +57,22 @@ end
 % error check: was tempTrack passed in as argument? if not, make it
 if nargin<4
     tempTrack = struct;
+end
+
+% interpret keypts_index
+if iscell(keypts_index_in)
+    % use node-names to identify correct index for keypts
+    for ii = 1:numel(keypts_index_in)
+        if any(strcmp(mouseData.node_names,keypts_index_in{ii}))
+            keypts_index(ii) = find(strcmp(mouseData.node_names,keypts_index_in{ii}));
+        else
+            error('%s: keypts_index_in(%d) provided to function was not found in list of node_names',mfilename, ii)
+        end
+    end
+elseif isdouble(keypts_index_in)
+    % using keypoints already
+    % do nothing
+    keypts_index = keypts_index_in;
 end
 
 % check if we convert distance to cm
@@ -80,7 +95,7 @@ fprintf('Computing %s centroids, velocity, acceleration, and AOC ...', feature_n
 tStart = tic;
 
 %% create the field names from pairs of keypoints and initialize distance vectors
-tempTrack.([feature_name,'_cent']) = zeros(nFrames,1);
+% tempTrack.([feature_name,'_cent']) = zeros(nFrames,1);
 tempTrack.([feature_name,'_velocity_001',feature_name_ext]) = zeros(nFrames,1);
 
 %% create the different features values using generic keypoint info
@@ -144,6 +159,12 @@ for ii = 1:length(shockFrames)
         tempTrack.([feature_name,'_aoc_acceleration_001',feature_name_ext])(ii,1) = trapz(tempTrack.([feature_name,'_acceleration_001',feature_name_ext])(ii-win_size:ii));
     end
 end
+
+
+% clean up: remove cent_x and cent_y
+%tempTrack = rmfield(tempTrack, [feature_name,'_cent']);
+tempTrack = rmfield(tempTrack, [feature_name,'_cent_x']);
+tempTrack = rmfield(tempTrack, [feature_name,'_cent_y']);
 
 tEnd = toc(tStart);
 fprintf('Done in %5.3f s\n',tEnd)

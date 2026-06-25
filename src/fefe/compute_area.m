@@ -1,4 +1,4 @@
-function tempTrack = compute_area(mouseData, shockFrames, keypts_index, feature_name, tempTrack)
+function tempTrack = compute_area(mouseData, shockFrames, keypts_index_in, feature_name, tempTrack)
 % tempTrack = compute_area(mouseData, shockFrames, keypts_index, feature_name, tempTrack)
 %
 % This function will compute the area genreated by the points in
@@ -21,10 +21,12 @@ function tempTrack = compute_area(mouseData, shockFrames, keypts_index, feature_
 %   keypts: cell array of strings corresponds to the keypoint labels
 %      labels must be alphanumeric and may include an underscore; other
 %      characters are removed when fieldnames are created
-%   keypts_index: array of integers corresponds to the index is keypoint
-%      labels that define the larger body part
-%      e.g., "eye" is made up of "upper eye", "lower eye" and "inner eye"
-%      and "outer eye"; keypts_index would be the indices of those keypts
+%   keypts_index_in: array of integers corresponds to the index is keypoint
+%      labels that define the larger body part or a cell array of names of
+%      corresponding nodes, e.g., "eye" is made up of 
+%         {"upper eye", "lower eye" and "inner eye" and "outer eye"}
+%      keypts_index would be either cell array or the numerical indices for
+%      them
 %   feature_name: string for what to call the collection of keypoints, e.g.
 %      "eye"; this function will automatically append the string '_area'
 %      onto the feature_name provided by user
@@ -46,7 +48,6 @@ if iscell(mouseData)
     %mouseData = mouseData{1};
 end
 
-
 % error check: make sure mouseData has tracks in the structure
 if ~isfield(mouseData,'tracks')
     error('%s:Input structure "mouseData" does not contain the expected field "tracks"',mfilename);
@@ -56,6 +57,23 @@ end
 if nargin<4
     tempTrack = struct;
 end 
+
+% interpret keypts_index
+if iscell(keypts_index_in)
+    % use node-names to identify correct index for keypts
+    for ii = 1:numel(keypts_index_in)
+        if any(strcmp(mouseData.node_names,keypts_index_in{ii}))
+            keypts_index(ii) = find(strcmp(mouseData.node_names,keypts_index_in{ii}));
+        else
+            error('%s: keypts_index_in(%d) provided to function was not found in list of node_names',mfilename, ii)
+        end
+    end
+elseif isdouble(keypts_index_in)
+    % using keypoints already
+    % do nothing, data is in acceptable form
+    keypts_index = keypts_index_in;
+end
+
 
 % check if we convert distance to cm
 CONVERT_PX_TO_CM = 0; % flag to convert to CM

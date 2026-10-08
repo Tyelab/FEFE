@@ -34,7 +34,6 @@ if iscell(mouseData)
     %mouseData = mouseData{1};
 end
 
-end
 
 % error check: make sure mouseData has tracks in the structure
 if ~isfield(mouseData,'tracks') %#ok<SYNER>

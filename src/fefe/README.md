@@ -226,9 +226,12 @@ These are worth checking before relying on specific features:
 2. **Frame indexing in areas.** `compute_area` and `compute_triangle_area` read
    `tracks(ii,…)` / `tracks(ff,…)` (the loop counter) instead of `tracks(shockFrames(ii),…)`.
    They are only correct when `shockFrames = 1:N`.
-3. **`compute_ave_dist_from_previous_frame` won't parse.** It has a stray `end`
-   after the first error check (line 37). It also compares frame numbers against
-   the trial-start *indices* returned by `find(diff(shockFrames) > 20)`.
+3. **`compute_ave_dist_from_previous_frame` frame handling.** The stray `end` after
+   the first error check was removed (2026-10-08). Two problems remain:
+   - It errors when `shockFrames` includes video frame 1, because it reads
+     `tracks(frame-1,…)`, i.e. `tracks(0,…)`.
+   - It compares frame numbers against the trial-start *indices* returned by
+     `find(diff(shockFrames) > 20)`, so trial starts are not detected correctly.
 4. **Fixed (2026-10-08): `nargin` checks for `tempTrack`.** Several functions used
    `nargin<4` even though `tempTrack` is a later argument. Leaving `tempTrack` out
    then raised an "undefined variable" error instead of creating a new struct.

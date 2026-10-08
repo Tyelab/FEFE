@@ -51,7 +51,7 @@ if ~isfield(mouseData,'tracks')
 end
 
 % error check: was tempTrack passed in as argument? if not, make it
-if nargin<4
+if nargin<10
     tempTrack = struct;
 end
 

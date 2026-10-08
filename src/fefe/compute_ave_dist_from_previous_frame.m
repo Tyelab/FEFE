@@ -1,5 +1,5 @@
 function tempTrack = compute_ave_dist_from_previous_frame(mouseData, shockFrames, keypts, tempTrack)
-% tempTrack = compute_dist_features(mouseData, shockFrames, keypts)
+% tempTrack = compute_ave_dist_from_previous_frame(mouseData, shockFrames, keypts, tempTrack)
 %
 % This function will compute the distance for each keypoint from the
 % previous frame during the video frames given by shockFrames for a single

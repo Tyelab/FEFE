@@ -24,7 +24,8 @@ function tempTrack = compute_angle_between_centroids(mouseData, shockFrames, key
 %      keypnts that corresponds to label used to make up the angle  
 %      Ex. angle between ear, nose and mouth
 %   feature_name1, feature_name2, feature_name3: string for what to call
-%      the collection of keypoints, e.g. "head"
+%      the collection of keypoints, e.g. "head"; a warning is printed if a
+%      name is not a node name and is not labeling a group of keypoints
 %   tempTrack (optional) if this structure is passed in, this function will
 %      add fields; if not given, a new structure is created.
 %
@@ -52,7 +53,7 @@ if ~isfield(mouseData,'tracks')
 end
 
 % error check: was tempTrack passed in as argument? if not, make it
-if nargin<4
+if nargin<10
     tempTrack = struct;
 end
 
@@ -65,10 +66,27 @@ if size(keypts,1)~=size(mouseData.tracks,2)
     error('%s: Mismatch in node names and size of tracks!',mfilename)
 end
 
-% use feature_names to look up keypoint index
-keypt_index1 = find(strcmp(keypts,feature_name1));
-keypt_index2 = find(strcmp(keypts,feature_name2));
-keypt_index3 = find(strcmp(keypts,feature_name3));
+% warn if a feature_name is neither a node name nor the label for a group of
+% keypoints (i.e., more than one keypoint index given)
+feature_names_in = {feature_name1, feature_name2, feature_name3};
+keypt_indices_in = {keypt_index1, keypt_index2, keypt_index3};
+for nn = 1:3
+    if ~any(strcmp(keypts, feature_names_in{nn})) && numel(keypt_indices_in{nn})<2
+        if isempty(keypt_indices_in{nn})
+            warning('%s: "%s" is not a node name or a known feature, and no keypoint index was given; this angle will be all zeros',...
+                mfilename, feature_names_in{nn});
+        else
+            warning('%s: "%s" is not a node name or a known feature; using node "%s" from keypoint index %d instead',...
+                mfilename, feature_names_in{nn}, keypts{keypt_indices_in{nn}}, keypt_indices_in{nn});
+        end
+    end
+end
+
+% use the keypoint indices if given; only use feature_names to look up the
+% keypoint index when an index is empty
+if isempty(keypt_index1), keypt_index1 = find(strcmp(keypts,feature_name1)); end
+if isempty(keypt_index2), keypt_index2 = find(strcmp(keypts,feature_name2)); end
+if isempty(keypt_index3), keypt_index3 = find(strcmp(keypts,feature_name3)); end
 
 tStart = tic;
 %% Create feature name

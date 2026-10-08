@@ -59,6 +59,17 @@ end
 nFrames = size(shockFrames,2);
 keypts = clean_up_node_names(keypts);
 
+% verify that we have the same number of node names and tracks in mouseData
+% structure
+if size(keypts,1)~=size(mouseData.tracks,2)
+    error('%s: Mismatch in node names and size of tracks!',mfilename)
+end
+
+% use feature_names to look up keypoint index
+keypt_index1 = find(strcmp(keypts,feature_name1));
+keypt_index2 = find(strcmp(keypts,feature_name2));
+keypt_index3 = find(strcmp(keypts,feature_name3));
+
 tStart = tic;
 %% Create feature name
 

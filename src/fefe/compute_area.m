@@ -68,7 +68,7 @@ if iscell(keypts_index_in)
             error('%s: keypts_index_in(%d) provided to function was not found in list of node_names',mfilename, ii)
         end
     end
-elseif isdouble(keypts_index_in)
+elseif isnumeric(keypts_index_in)
     % using keypoints already
     % do nothing, data is in acceptable form
     keypts_index = keypts_index_in;
@@ -96,8 +96,8 @@ feature_name = [feature_name,'_area',feature_name_ext];
 tempTrack.(feature_name) = zeros(nFrames,1);
 
 for ii = 1:length(shockFrames)
-     x = mouseData.tracks(ii,keypts_index,1);
-     y = mouseData.tracks(ii,keypts_index,2);
+     x = mouseData.tracks(shockFrames(ii),keypts_index,1);
+     y = mouseData.tracks(shockFrames(ii),keypts_index,2);
     if CONVERT_PX_TO_CM
         x = x * conversionFactorPixToCm;
         y = y * conversionFactorPixToCm;

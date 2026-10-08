@@ -224,9 +224,12 @@ These are worth checking before relying on specific features:
    a zero angle. `compute_angle_between_keypoints` has **no** such check. It looks
    points up by name only, so a mistyped name there still gives an angle of 0 for
    every frame without any warning.
-2. **Frame indexing in areas.** `compute_area` and `compute_triangle_area` read
-   `tracks(ii,…)` / `tracks(ff,…)` (the loop counter) instead of `tracks(shockFrames(ii),…)`.
-   They are only correct when `shockFrames = 1:N`.
+2. **Fixed (2026-10-08): frame indexing in areas.** `compute_area` and
+   `compute_triangle_area` used to read `tracks(ii,…)` / `tracks(ff,…)` (the loop
+   counter) instead of the requested video frame. They now index by
+   `shockFrames`. Results were already correct for `shockFrames = 1:N`. For any
+   other frame set, earlier area features came from the wrong frames and should
+   be recomputed.
 3. **Fixed (2026-10-08): `compute_ave_dist_from_previous_frame` frame handling.**
    - The stray `end` after the first error check was removed.
    - Trial starts used to be the *positions* returned by `find(diff(shockFrames) > 20)`,
@@ -245,3 +248,8 @@ These are worth checking before relying on specific features:
    `compute_angle_between_centroids` and `compute_triangle_area` (10),
    `compute_angle_between_keypoints` (7), `compute_centroid_features` (6),
    `compute_area` (5). `tempTrack` is now optional in every feature function.
+5. **Fixed (2026-10-08): numeric keypoint indices in `compute_area` and
+   `compute_centroid_features`.** Both functions checked `isdouble(keypts_index_in)`,
+   which is not a MATLAB function. Passing numeric indices such as `[1,2,3,4]`, as
+   the demo does, raised `Unrecognized function or variable 'isdouble'`. The check
+   is now `isnumeric`, so numeric indices and cell arrays of node names both work.

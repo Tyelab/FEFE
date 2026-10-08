@@ -51,7 +51,7 @@ if ~isfield(mouseData,'tracks')
 end
 
 % error check: was tempTrack passed in as argument? if not, make it
-if nargin<4
+if nargin<10
     tempTrack = struct;
 end
 
@@ -94,16 +94,16 @@ for ff = 1:nFrames
         warning('Event frame selected is past end of video')
         continue
     end
-    bp1 =  squeeze(mouseData.tracks(ff,ii,:))'; % bodypoint in pixels
-    bp2 =  squeeze(mouseData.tracks(ff,jj,:))'; % bodypoint in pixels
+    bp1 =  squeeze(mouseData.tracks(frame,ii,:))'; % bodypoint in pixels
+    bp2 =  squeeze(mouseData.tracks(frame,jj,:))'; % bodypoint in pixels
     a = pdist([bp1; bp2], 'euclidean')*conversionFactorPixToCm; % now convert dist to cm if specified
 
-    bp1 =  squeeze(mouseData.tracks(ff,ii,:))'; % bodypoint in pixels
-    bp2 =  squeeze(mouseData.tracks(ff,kk,:))'; % bodypoint in pixels
+    bp1 =  squeeze(mouseData.tracks(frame,ii,:))'; % bodypoint in pixels
+    bp2 =  squeeze(mouseData.tracks(frame,kk,:))'; % bodypoint in pixels
     b = pdist([bp1; bp2], 'euclidean')*conversionFactorPixToCm; % now convert dist to cm if specified
 
-    bp1 =  squeeze(mouseData.tracks(ff,jj,:))'; % bodypoint in pixels
-    bp2 =  squeeze(mouseData.tracks(ff,kk,:))'; % bodypoint in pixels
+    bp1 =  squeeze(mouseData.tracks(frame,jj,:))'; % bodypoint in pixels
+    bp2 =  squeeze(mouseData.tracks(frame,kk,:))'; % bodypoint in pixels
     c = pdist([bp1; bp2], 'euclidean')*conversionFactorPixToCm; % now convert dist to cm if specified
 
     % Heron's formula for area of triangle, given length of 3 sides 

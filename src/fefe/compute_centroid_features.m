@@ -55,7 +55,7 @@ if ~isfield(mouseData,'tracks')
 end
 
 % error check: was tempTrack passed in as argument? if not, make it
-if nargin<4
+if nargin<6
     tempTrack = struct;
 end
 
@@ -69,7 +69,7 @@ if iscell(keypts_index_in)
             error('%s: keypts_index_in(%d) provided to function was not found in list of node_names',mfilename, ii)
         end
     end
-elseif isdouble(keypts_index_in)
+elseif isnumeric(keypts_index_in)
     % using keypoints already
     % do nothing
     keypts_index = keypts_index_in;

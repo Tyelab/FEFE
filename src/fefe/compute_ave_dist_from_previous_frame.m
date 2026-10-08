@@ -58,7 +58,9 @@ pointDistAll = zeros(nFrames,nPoints);
 
 
 %% create the different features values using generic keypoint info
-trial_start_frames = find(diff(shockFrames)>20);
+% video frame numbers that start each trial: the first frame, and the frame
+% after each gap of more than 20 frames (no previous frame to compare to)
+trial_start_frames = shockFrames([1, find(diff(shockFrames)>20)+1]);
 for ff = 1:nFrames
     
     % this frame

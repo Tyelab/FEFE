@@ -153,8 +153,9 @@ tempTrack = compute_ave_dist_from_previous_frame(mouseData, shockFrames, keypts,
 - **Feature:** `pointDistAllAve` is the displacement of each keypoint since the
   previous video frame, averaged over all keypoints. It is a global "how much is
   the face moving" signal.
-- Set to 0 on the first frame of a new trial (detected as a gap of more than 20
-  frames in `shockFrames`). Outliers are removed. Values are always in pixels (no cm conversion).
+- Set to 0 on the first frame of `shockFrames` and on the first frame of each new
+  trial (detected as a gap of more than 20 frames in `shockFrames`), since those
+  frames have no previous frame in the same trial. Outliers are removed. Values are always in pixels (no cm conversion).
 - The old `compute_dist_features` was removed. Use `compute_dist_between_keypoints`
   for its pairwise distances and this function for its `pointDistAllAve`.
 
@@ -226,12 +227,17 @@ These are worth checking before relying on specific features:
 2. **Frame indexing in areas.** `compute_area` and `compute_triangle_area` read
    `tracks(ii,…)` / `tracks(ff,…)` (the loop counter) instead of `tracks(shockFrames(ii),…)`.
    They are only correct when `shockFrames = 1:N`.
-3. **`compute_ave_dist_from_previous_frame` frame handling.** The stray `end` after
-   the first error check was removed (2026-10-08). Two problems remain:
-   - It errors when `shockFrames` includes video frame 1, because it reads
-     `tracks(frame-1,…)`, i.e. `tracks(0,…)`.
-   - It compares frame numbers against the trial-start *indices* returned by
-     `find(diff(shockFrames) > 20)`, so trial starts are not detected correctly.
+3. **Fixed (2026-10-08): `compute_ave_dist_from_previous_frame` frame handling.**
+   - The stray `end` after the first error check was removed.
+   - Trial starts used to be the *positions* returned by `find(diff(shockFrames) > 20)`,
+     compared against frame numbers. As a result:
+     - The function errored when `shockFrames` began at video frame 1, because
+       it read `tracks(0,…)`. That includes the demo's `1:N`.
+     - The first frame of each later trial was compared with the last frame of
+       the previous trial.
+   - Trial starts are now the frame numbers of the first frame and of the frame
+     after each gap, and those frames get 0. Earlier `pointDistAllAve` values at
+     trial boundaries should be recomputed.
 4. **Fixed (2026-10-08): `nargin` checks for `tempTrack`.** Several functions used
    `nargin<4` even though `tempTrack` is a later argument. Leaving `tempTrack` out
    then raised an "undefined variable" error instead of creating a new struct.
